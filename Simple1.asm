@@ -1,34 +1,37 @@
-	#include p18f87k22.inc
+#include p18f87k22.inc
 	
 	code
 	org 0x0
-	goto	setup
-	
+	goto	start
 	org 0x100		    ; Main code starts here at address 0x100
 
-	; ******* Programme FLASH read Setup Code ****  
-setup	bcf	EECON1, CFGS	; point to Flash program memory  
-	bsf	EECON1, EEPGD 	; access Flash program memory
-	goto	start
-	; ******* My data and where to put it in RAM *
-myTable data	"This is just some data"
-	constant 	myArray=0x400	; Address in RAM for data
-	constant 	counter=0x10	; Address of counter variable
-	; ******* Main programme *********************
-start 	lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
-	movlw	upper(myTable)	; address of data in PM
-	movwf	TBLPTRU		; load upper bits to TBLPTRU
-	movlw	high(myTable)	; address of data in PM
-	movwf	TBLPTRH		; load high byte to TBLPTRH
-	movlw	low(myTable)	; address of data in PM
-	movwf	TBLPTRL		; load low byte to TBLPTRL
-	movlw	.22		; 22 bytes to read
-	movwf 	counter		; our counter register
-loop 	tblrd*+			; move one byte from PM to TABLAT, increment TBLPRT
-	movff	TABLAT, POSTINC0	; move read data from TABLAT to (FSR0), increment FSR0	
-	decfsz	counter		; count down to zero
-	bra	loop		; keep going until finished
+start
+	movlw 	0xFF
+	movwf	TRISD, ACCESS	    ; Port D all inputs
+	movwf	TRISE, ACCESS	    ; Port E all inputs
 	
-	goto	0
-
+	movlw 	0x00
+	movwf	TRISC, ACCESS	    ; Port C all outputs
+	bra 	test
+	
+loop	movff 	0x07, PORTC
+	incf 	0x07, W, ACCESS
+	movlw 	0x00
+	movwf   0x03		    ;reset delay counter to zero
+	call    delay, FAST	    ;delay loop changes W hence use fast to conserve W
+	
+test	movwf	0x07, ACCESS	    ; Test for end of loop condition
+	movf	PORTD, W, ACCESS    ; use Port D to set length of loop
+	cpfsgt 	0x07, ACCESS
+	bra 	loop		    ; Not yet finished goto start of loop again
+	goto 	0x0		    ; Re-run program from start
+	
+delay 	movf    PORTE,W		    ;compare requires W so must set it to the input Port E
+	incf    0x03		    ;increment delay counter
+	cpfsgt 	0x03,ACCESS	    ;compare W(Port E) to current value of delay counter
+	bra delay		    ;loop through delay again
+	return FAST
+	
 	end
+
+
