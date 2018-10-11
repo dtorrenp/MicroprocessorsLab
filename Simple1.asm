@@ -10,15 +10,18 @@ start
 	movwf	TRISD, ACCESS	    ; Port D all inputs
 	movwf	TRISE, ACCESS	    ; Port E all inputs
 	
+	movlw   0xFF
+	movwf   0x04
 	movlw 	0x00
 	movwf	TRISC, ACCESS	    ; Port C all outputs
 	bra 	test
 	
 loop	movff 	0x07, PORTC
 	incf 	0x07, W, ACCESS
-	movlw 	0x00
-	movwf   0x03		    ;reset delay counter to zero
+delay_loop	call    delay_reset,FAST
 	call    delay, FAST	    ;delay loop changes W hence use fast to conserve W
+	decfsz 	0x04, f, ACCESS
+	bra     delay_loop
 	
 test	movwf	0x07, ACCESS	    ; Test for end of loop condition
 	movf	PORTD, W, ACCESS    ; use Port D to set length of loop
@@ -26,6 +29,10 @@ test	movwf	0x07, ACCESS	    ; Test for end of loop condition
 	bra 	loop		    ; Not yet finished goto start of loop again
 	goto 	0x0		    ; Re-run program from start
 	
+delay_reset 	movlw 	0x00
+		movwf   0x03
+		return FAST
+		
 delay 	movf    PORTE,W		    ;compare requires W so must set it to the input Port E
 	incf    0x03		    ;increment delay counter
 	cpfsgt 	0x03,ACCESS	    ;compare W(Port E) to current value of delay counter
