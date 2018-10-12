@@ -5,39 +5,35 @@
 	goto	start
 	org 0x100		    ; Main code starts here at address 0x100
 
-start
-	movlw 	0xFF
-	movwf	TRISD, ACCESS	    ; Port D all inputs
-	movwf	TRISE, ACCESS	    ; Port E all inputs
+	; ******* Programme FLASH read Setup Code ****
+setup	bcf EECON1, CFGS	    ; point to Flash program memory
+	bsf EECON1, EEPGD	    ; access Flash program memory
+	goto start
 	
-	movlw   0xFF
-	movwf   0x04
-	movlw 	0x00
-	movwf	TRISC, ACCESS	    ; Port C all outputs
-	bra 	test
+	; ******* My data and where to put it in RAM *
+myTable data "This is just some data"
+	constant myArray=0x400	    ; Address in RAM for data
+	constant counter=0x10	    ; Address of counter variable
 	
-loop	movff 	0x07, PORTC
-	incf 	0x07, W, ACCESS
-delay_loop	call    delay_reset,FAST
-	call    delay, FAST	    ;delay loop changes W hence use fast to conserve W
-	decfsz 	0x04, f, ACCESS
-	bra     delay_loop
 	
-test	movwf	0x07, ACCESS	    ; Test for end of loop condition
-	movf	PORTD, W, ACCESS    ; use Port D to set length of loop
-	cpfsgt 	0x07, ACCESS
-	bra 	loop		    ; Not yet finished goto start of loop again
-	goto 	0x0		    ; Re-run program from start
-	
-delay_reset 	movlw 	0x00
-		movwf   0x03
-		return FAST
+initial movlw 0x00
+	movwf 0x03
+	movlw 0xFF
+	movwf 0x07
+	lfsr FSR0, 0x004
+	lfsr FSR1, 0x004
+
+write_loop   movff 0x03, FSR0
+	incf  0x03
+	incf FSR0
+	decfsz 0x07
+	bra write_loop
 		
-delay 	movf    PORTE,W		    ;compare requires W so must set it to the input Port E
-	incf    0x03		    ;increment delay counter
-	cpfseq 	0x03,ACCESS	    ;compare W(Port E) to current value of delay counter
-	bra delay		    ;loop through delay again
-	return FAST
+read    movff FSR1, 0x05
+	incf FSR1
+	cpfseq FSR
+	goto 0x0
+	
 	
 	end
 
