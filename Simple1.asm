@@ -35,7 +35,7 @@ delay_reset 	movlw 	0x00
 		
 delay 	movf    PORTE,W		    ;compare requires W so must set it to the input Port E
 	incf    0x03		    ;increment delay counter
-	cpfsgt 	0x03,ACCESS	    ;compare W(Port E) to current value of delay counter
+	cpfseq 	0x03,ACCESS	    ;compare W(Port E) to current value of delay counter
 	bra delay		    ;loop through delay again
 	return FAST
 	
