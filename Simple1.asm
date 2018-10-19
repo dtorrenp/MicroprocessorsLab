@@ -5,67 +5,30 @@
 	goto	start
 	org 0x100		    ; Main code starts here at address 0x100
 	
-start	
-	movlw 0x04
-	movwf 0x05
-	movlw 0x07
-	movwf 0x06
+start
+    call    SPI_MasterInit
+    movlw   0x55
+    call    SPI_MasterTransmit
+    goto    0
 	
-	movlw 0x00 
-	movwf TRISD, A		    ; all bits out on Port D
-	movwf TRISE, A		    ; all bits out on Port E
-	movwf TRISC, A
-	movwf TRISJ, A
+SPI_MasterInit ; Set Clock edge to positive
+    bcf SSP2STAT, CKE
+    ; MSSP enable; CKP=1; SPI master, clock=Fosc/64 (1MHz)
+    movlw (1<<SSPEN)|(1<<CKP)|(0x02)
+    movwf SSP2CON1
+    ; SDO2 output; SCK2 output
+    bcf TRISD, SDO2
+    bcf TRISD, SCK2
+    return
+    
+SPI_MasterTransmit ; Start transmission of data (held in W)
+    movwf SSP2BUF
+Wait_Transmit ; Wait for transmission to complete
+    btfss PIR2, SSP2IF
+    bra Wait_Transmit
+    bcf PIR2, SSP2IF ; clear interrupt flag
+   
+    return
 	
-	movlw 0x0F		    ; Set all to high
-	movwf PORTD
-	
-increase 
-	incf  0x05
-	incf  0x06
-	
-ClockOnWrite	
-	movlw 0x00		    ; Enable Port E output
-	movwf TRISE, A	
-	
-	movff 0x05, PORTE	    ; Set data pattern on Port E
-	
-	movlw 0x0E		    ; clock one to low
-	movwf PORTD		  	    
-
-	movlw 0x0F		    ; Clock one high
-	movwf PORTD
-	
-	movff 0x06, PORTE	    ; Set data pattern on Port E
-	
-	movlw 0x0B		    ; Clock two to low
-	movwf PORTD
-	
-	movlw 0x0F		    ; Clock one to high
-	movwf PORTD
-	
-clock_offRead
-	movlw 0xFF		    ; Enable Port E input
-	movwf TRISE, A	
-	
-	movlw  0x0D		    ; Move memory one OE low
-	movwf PORTD
-	
-	movff PORTE,PORTC	    ; Show read data
-	
-	movlw  0x0F		    ; raise memory one OE
-	movwf PORTD
-	
-	movlw  0x07		    ; lower memory two OE
-	movwf PORTD
-	
-	movff PORTE,PORTJ	    ; Show read data
-	
-	movlw  0x0F		    ; raise memory two OE
-	movwf PORTD
-
-	bra increase
-
-	
-	end
+    end
 	
