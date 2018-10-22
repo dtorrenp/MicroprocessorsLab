@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 
-    global  LCD_Setup, LCD_Write_Message, LCD_clear
+    global  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_move
 
 acs0    udata_acs   ; named variables in access ram
 LCD_cnt_l   res 1   ; reserve 1 byte for variable LCD_cnt_l
@@ -20,7 +20,7 @@ LCD_Setup
 	movwf	TRISB
 	movlw   .40
 	call	LCD_delay_ms	; wait 40ms for LCD to start up properly
-	movlw	b'00000011'	; Function set 4-bit
+	movlw	b'00000010'	; Function set 4-bit
 	call	LCD_Send_Nib
 	movlw	.10		; wait 40us
 	call	LCD_delay_x4us
@@ -49,11 +49,6 @@ LCD_Setup
 	;call	LCD_Send_Byte_I
 	;movlw	.10		; wait 40us
 	;call	LCD_delay_x4us
-	
-	movlw	b'11000001'	; maybe shift down
-	call	LCD_Send_Byte_I
-	movlw	.10		; wait 40us
-	call	LCD_delay_x4us
 	return
 
 LCD_clear
@@ -61,6 +56,13 @@ LCD_clear
 	call	LCD_Send_Byte_I
 	movlw	.2		; wait 2ms
 	call	LCD_delay_ms
+	return
+	
+LCD_move
+	movlw	b'11000000'	; maybe shift down
+	call	LCD_Send_Byte_I
+	movlw	.20		; wait 40us
+	call	LCD_delay_x4us
 	return
 
 LCD_Write_Message	    ; Message stored at FSR2, length stored in W
