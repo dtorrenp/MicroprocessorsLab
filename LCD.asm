@@ -52,6 +52,12 @@ LCD_clear
 	movlw	.2		; wait 2ms
 	call	LCD_delay_ms
 	return
+	
+LCD_cursor
+	movlw	b'0011100'
+	call	LCD_Send_Byte_I
+	movlw	.10		; wait 40us
+	call	LCD_delay_x4us
 
 LCD_Write_Message	    ; Message stored at FSR2, length stored in W
 	movwf   LCD_counter
