@@ -16,8 +16,8 @@ rst	code	0    ; reset vector
 pdata	code    ; a section of programme memory for storing data
 	; ******* myTable, data in programme memory, and its length *****
 	
-myTable data	    "Hello Dan!                              Hello Tom!\n"	; message, plus carriage return
-	constant    myTable_l=.51	; length of data
+myTable data	    "Hello Dan!\n"	; message, plus carriage return
+	constant    myTable_l=.11	; length of data
 	
 main	code
 	; ******* Programme FLASH read Setup Code ***********************

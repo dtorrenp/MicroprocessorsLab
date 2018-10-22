@@ -32,7 +32,7 @@ LCD_Setup
 	call	LCD_Send_Byte_I
 	movlw	.10		; wait 40us
 	call	LCD_delay_x4us
-	movlw	b'00001110'	; display on, cursor on, blinking off
+	movlw	b'00001111'	; display on, cursor on, blinking on
 	call	LCD_Send_Byte_I
 	movlw	.10		; wait 40us
 	call	LCD_delay_x4us
@@ -41,6 +41,16 @@ LCD_Setup
 	movlw	.2		; wait 2ms
 	call	LCD_delay_ms
 	movlw	b'00000110'	; entry mode incr by 1 no shift
+	call	LCD_Send_Byte_I
+	movlw	.10		; wait 40us
+	call	LCD_delay_x4us
+	
+	;movlw	b'00010110'	; shift to right
+	;call	LCD_Send_Byte_I
+	;movlw	.10		; wait 40us
+	;call	LCD_delay_x4us
+	
+	movlw	b'11000001'	; maybe shift down
 	call	LCD_Send_Byte_I
 	movlw	.10		; wait 40us
 	call	LCD_delay_x4us
