@@ -13,6 +13,7 @@ rst	code	0    ; reset vector
 	goto	setup
 
 pdata	code    ; a section of programme memory for storing data
+	
 	; ******* myTable, data in programme memory, and its length *****
 myTable data	    "Hello World!\n"	; message, plus carriage return
 	constant    myTable_l=.13	; length of data

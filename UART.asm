@@ -13,7 +13,7 @@ UART_Setup
     bcf	    TXSTA1, BRGH    ; slow speed
     bsf	    TXSTA1, TXEN    ; enable transmit
     bcf	    BAUDCON1, BRG16 ; 8-bit generator only
-    movlw   .103	    ; gives 9600 Baud rate (actually 9615)
+    movlw   .206	    ; gives 9600 Baud rate (actually 9615)
     movwf   SPBRG1
     bsf	    TRISC, TX1	    ; TX1 pin as output
     return
