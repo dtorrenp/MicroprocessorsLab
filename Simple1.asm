@@ -16,7 +16,7 @@ rst	code	0    ; reset vector
 pdata	code    ; a section of programme memory for storing data
 	; ******* myTable, data in programme memory, and its length *****
 	
-myTable data	    "Hello Dan!\n"	; message, plus carriage return
+myTable data	    "Tom > Dan!\n"	; message, plus carriage return
 	constant    myTable_l=.11	; length of data
 	
 main	code
@@ -60,5 +60,7 @@ loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 delay	decfsz	delay_count	; decrement until zero
 	bra delay
 	return
-
+	
+	
+	
 	end
