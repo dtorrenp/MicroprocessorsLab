@@ -45,7 +45,7 @@ loop 	tblrd*+			; one byte from PM to TABLAT, increment TBLPRT
 	lfsr	FSR2, myArray
 	call	LCD_Write_Message
 	
-	call	LCD_clear
+	;call	LCD_clear
 	
 	movlw	myTable_l	; output message to UART
 	lfsr	FSR2, myArray
