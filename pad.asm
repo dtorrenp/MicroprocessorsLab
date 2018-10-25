@@ -44,7 +44,7 @@ second_row
     
 third_row
     movlw   b'00001101'		    
-    cpfseq  pad_row			;if no button is pressed reads again
+    cpfseq  pad_row	            		;if no button is pressed reads again
     bra	    fourth_row
     bra	    pad_column
   
