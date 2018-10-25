@@ -7,6 +7,7 @@ LCD_tmp	    res 1   ; reserve 1 byte for temporary use
 LCD_counter res 1   ; reserve 1 byte for counting through nessage
 pad_row res 1
 pad_column res 1
+pad_final res 1
 
 pad code
 
@@ -17,25 +18,76 @@ pad_setup
     movwf   TRISE, A
     movlw   .10
     call    LCD_delay_x4us
+    movlw   0x00
+    movwf   TRISD, A
     
 pad_read
     movlw   0x0F
     movwf   TRISE, A
     movlw   .10
     call    LCD_delay_x4us
-    movwf   PORTE, pad_row
+    movff   PORTE, pad_row
+    movlw   b'00001111'		    
+    cpfslt  pad_row			;if no button is pressed reads again
+    bra	    pad_read
     
+    movlw   b'00000111'		    
+    cpfseq  pad_row			;if no button is pressed reads again
+    bra	    second_row
+    bra	    pad_column
+    
+second_row    
+    movlw   b'00001011'		    
+    cpfseq  pad_row			;if no button is pressed reads again
+    bra	    third_row
+    bra	    pad_column
+    
+third_row
+    movlw   b'00001101'		    
+    cpfseq  pad_row			;if no button is pressed reads again
+    bra	    fourth_row
+    bra	    pad_column
+  
+fourth_row
+    movlw   b'00001110'		    
+    cpfseq  pad_row			;if no button is pressed reads again
+    bra	    pad_read
+    
+    
+pad_column
     movlw   0xF0
     movwf   TRISE, A
     movlw   .10
     call    LCD_delay_x4us
-    movwf   PORTE, pad_column
+    movff   PORTE, pad_column
     
-    iorwf   
+    movlw   b'01110000'		    
+    cpfseq  pad_column 			;if no button is pressed reads again
+    bra	    second_column 
+    bra	    determine_output
     
+second_column    
+    movlw   b'10110000'		    
+    cpfseq  pad_column 			;if no button is pressed reads again
+    bra	    third_column 
+    bra	    determine_output
     
+third_column 
+    movlw   b'11010000'		    
+    cpfseq  pad_column 			;if no button is pressed reads again
+    bra	    fourth_column 
+    bra	    determine_output
+  
+fourth_column 
+    movlw   b'11100000'		    
+    cpfseq  pad_column 			;if no button is pressed reads again
+    bra	    determine_output
     
-    
+determine_output
+    movff  pad_row,W
+    addwf  pad_column,pad_final
+    movff  pad_final, PORTD
+
     
 LCD_delay_x4us		    ; delay given in chunks of 4 microsecond in W
 	movwf	LCD_cnt_l   ; now need to multiply by 16
