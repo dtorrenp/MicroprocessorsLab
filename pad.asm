@@ -1,6 +1,7 @@
 #include p18f87k22.inc
     
     global Pad_Setup, Pad_Read
+    extern  LCD_clear
     
 acs0    udata_acs   ; named variables in access ram
 PAD_cnt_l   res 1   ; reserve 1 byte for variable PAD_cnt_l
@@ -40,21 +41,22 @@ Pad_Read
     call    PAD_delay_x4us
     movff   PORTE, pad_column
     movf    pad_row,W
-    addwf   pad_column, W
+    iorwf   pad_column, W
     movwf   pad_final
     movff   pad_final, PORTD
     
-    
+
     movlw   b'11111111'		    
     cpfseq  pad_final			;if no button is pressed reads again
     bra	    oneRoneC
-    retlw   0x20
+    bra	    Pad_Read
 
     oneRoneC
     movlw   b'01110111'		    
     cpfseq  pad_final			;first row first column
     bra	    twoRoneC
-    retlw   0x43
+    call    LCD_clear
+    retlw   0x20
     
     twoRoneC
     movlw   b'10110111'		    

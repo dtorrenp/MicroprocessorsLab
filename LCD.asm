@@ -1,6 +1,6 @@
 #include p18f87k22.inc
 
-    global  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_move, LCD_delay_ms,LCD_Send_Byte_D	
+    global  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_move, LCD_delay_ms,LCD_Send_Byte_D,LCD_shiftright	
 
 acs0    udata_acs   ; named variables in access ram
 LCD_cnt_l   res 1   ; reserve 1 byte for variable LCD_cnt_l
@@ -32,7 +32,7 @@ LCD_Setup
 	call	LCD_Send_Byte_I
 	movlw	.10		; wait 40us
 	call	LCD_delay_x4us
-	movlw	b'00001111'	; display on, cursor on, blinking on
+	movlw	b'00001110'	; display on, cursor on, blinking on
 	call	LCD_Send_Byte_I
 	movlw	.10		; wait 40us
 	call	LCD_delay_x4us
@@ -51,6 +51,13 @@ LCD_Setup
 	;call	LCD_delay_x4us
 	return
 
+LCD_shiftright
+	movlw	b'00010110'	; shift to right
+	call	LCD_Send_Byte_I
+	movlw	.10		; wait 40us
+	call	LCD_delay_x4us
+	return
+	
 LCD_clear
 	movlw	b'00000001'	; display clear
 	call	LCD_Send_Byte_I

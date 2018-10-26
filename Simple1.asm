@@ -1,7 +1,7 @@
 	#include p18f87k22.inc
 
 	extern	UART_Setup, UART_Transmit_Message  ; external UART subroutines
-	extern  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_move,LCD_delay_ms,LCD_Send_Byte_D	; external LCD subroutines
+	extern  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_move,LCD_delay_ms,LCD_Send_Byte_D,LCD_shiftright	; external LCD subroutines
 	extern	Pad_Setup, Pad_Read
 	
 acs0	udata_acs   ; reserve data space in access ram
@@ -34,10 +34,12 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	; ******* Main programme ****************************************
 start 	call	Pad_Read
 	movwf	PORTH
-	call	LCD_Send_Byte_D	
-	movlw	.70
+	
+	call	LCD_Send_Byte_D
+	movlw	.255
+	call	LCD_delay_ms	
+	movlw	.255
 	call	LCD_delay_ms
-	call	LCD_clear
 	bra	start
 	
 	;lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
