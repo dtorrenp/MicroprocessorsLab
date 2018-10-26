@@ -33,7 +33,14 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	
 	; ******* Main programme ****************************************
 start 	call	Pad_Read
+	lfsr	FSR2, W
+	movlw	.1	; bytes to read
+	movwf 	counter		; our counter register
+	call	LCD_Write_Message
+	call    delay
+	call	LCD_clear
 	bra	start
+	
 	lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
 	movlw	upper(myTable)	; address of data in PM
 	movwf	TBLPTRU		; load upper bits to TBLPTRU

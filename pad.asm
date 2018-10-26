@@ -32,70 +32,118 @@ Pad_Read
     movlw   .10
     call    PAD_delay_x4us
     movff   PORTE, pad_row
-    movlw   b'00001111'		    
-    cpfslt  pad_row			;if no button is pressed reads again
-    retlw   0xFF
-    
-    movlw   b'00000111'		    
-    cpfseq  pad_row			;if no button is pressed reads again
-    bra	    second_row
-    bra	    Pad_column
-    
-second_row    
-    movlw   b'00001011'		    
-    cpfseq  pad_row			;if no button is pressed reads again
-    bra	    third_row
-    bra	    Pad_column
-    
-third_row
-    movlw   b'00001101'		    
-    cpfseq  pad_row			;if no button is pressed reads again
-    bra	    fourth_row
-    bra	    Pad_column
-  
-fourth_row
-    movlw   b'00001110'		    
-    cpfseq  pad_row			;if no button is pressed reads again
-    retlw   0xFF
-    
-    
-Pad_column
     movlw   0xF0
     movwf   TRISE, A
     movlw   .10
     call    PAD_delay_x4us
     movff   PORTE, pad_column
-    
-    movlw   b'01110000'		    
-    cpfseq  pad_column 			;if no button is pressed reads again
-    bra	    second_column 
-    bra	    determine_output
-    
-second_column    
-    movlw   b'10110000'		    
-    cpfseq  pad_column 			;if no button is pressed reads again
-    bra	    third_column 
-    bra	    determine_output
-    
-third_column 
-    movlw   b'11010000'		    
-    cpfseq  pad_column 			;if no button is pressed reads again
-    bra	    fourth_column 
-    bra	    determine_output
-  
-fourth_column 
-    movlw   b'11100000'		    
-    cpfseq  pad_column 			;if no button is pressed reads again
-    retlw   0xFF
-    bra	    determine_output
-    
-determine_output
     movf    pad_row,W
     addwf   pad_column, W
     movwf   pad_final
     movff   pad_final, PORTD
-    return
+    
+    
+    movlw   b'11111111'		    
+    cpfseq  pad_final			;if no button is pressed reads again
+    retlw   0xFF
+    
+Check_symbol
 
+    oneRoneC
+    movlw   b'01110111'		    
+    cpfseq  pad_final			;first row first column
+    bra	    twoRoneC
+    retlw   0x31
+    
+    twoRoneC
+    movlw   b'10110111'		    
+    cpfseq  pad_final			;second row first column
+    bra	    threeRoneC
+    retlw   0x34
+   
+    threeRoneC
+    movlw   b'11010111'		    
+    cpfseq  pad_final			;third row first column
+    bra	    fourRoneC
+    retlw   0x37
+    
+    fourRoneC
+    movlw   b'11100111'		    
+    cpfseq  pad_final			;fourth row first column
+    bra	    oneRtwoC
+    retlw   0x41
+    
+    oneRtwoC
+    movlw   b'01111011'		    
+    cpfseq  pad_final			;first row second column
+    bra	    twoRtwoC
+    retlw   0x32
+    
+    twoRtwoC
+    movlw   b'10111011'			;second row second column
+    cpfseq  pad_final			
+    bra	    threeRtwoC
+    retlw   0x35
+    
+    threeRtwoC
+    movlw   b'11011011'			;third row second column
+    cpfseq  pad_final			
+    bra	    fourRtwoC
+    retlw   0x38
+    
+    fourRtwoC
+    movlw   b'11101011'		    
+    cpfseq  pad_final			;fourth row second column etc
+    bra	    oneRthreeC
+    retlw   0x30
+    
+    oneRthreeC
+    movlw   b'01111101'		    
+    cpfseq  pad_final			
+    bra	    twoRthreeC
+    retlw   0x33
+    
+    twoRthreeC
+    movlw   b'10111101'		    
+    cpfseq  pad_final			
+    bra	    threeRthreeC
+    retlw   0x36
+    
+    threeRthreeC
+    movlw   b'11011101'		    
+    cpfseq  pad_final			
+    bra	    fourRthreeC
+    retlw   0x39
+    
+    fourRthreeC
+    movlw   b'11101101'		    
+    cpfseq  pad_final			
+    bra	    oneRfourC
+    retlw   0x42
+    
+    oneRfourC
+    movlw   b'01111110'		    
+    cpfseq  pad_final			
+    bra	    twoRfourC
+    retlw   0x46
+    
+    twoRfourC
+    movlw   b'10111110'		    
+    cpfseq  pad_final			
+    bra	    threeRfourC
+    retlw   0x45
+    
+    threeRfourC
+    movlw   b'11011110'		    
+    cpfseq  pad_final			
+    bra	    fourRfourC
+    retlw   0x44
+    
+    fourRfourC
+    movlw   b'11101110'		    
+    cpfseq  pad_final			
+    return  0xFF
+    retlw   0x43
     
 PAD_delay_x4us			; delay given in chunks of 4 microsecond in W
     movwf	PAD_cnt_l	; now need to multiply by 16
