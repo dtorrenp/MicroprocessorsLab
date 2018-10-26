@@ -1,7 +1,7 @@
 	#include p18f87k22.inc
 
 	extern	UART_Setup, UART_Transmit_Message  ; external UART subroutines
-	extern  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_move	    ; external LCD subroutines
+	extern  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_move,LCD_delay_ms,LCD_Send_Byte_D	; external LCD subroutines
 	extern	Pad_Setup, Pad_Read
 	
 acs0	udata_acs   ; reserve data space in access ram
@@ -17,7 +17,7 @@ rst	code	0    ; reset vector
 pdata	code    ; a section of programme memory for storing data
 	; ******* myTable, data in programme memory, and its length *****
 	
-myTable data	    "Tom > Dan!\n"	; message, plus carriage return
+myTable data	    ""	; message, plus carriage return
 	constant    myTable_l=.11	; length of data
 	
 main	code
@@ -33,16 +33,15 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	
 	; ******* Main programme ****************************************
 start 	call	Pad_Read
-	lfsr	FSR2, W
-	movlw	.1	; bytes to read
-	movwf 	counter		; our counter register
-	call	LCD_Write_Message
-	call    delay
+	movwf	PORTH
+	call	LCD_Send_Byte_D	
+	movlw	.70
+	call	LCD_delay_ms
 	call	LCD_clear
 	bra	start
 	
-	lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
-	movlw	upper(myTable)	; address of data in PM
+	;lfsr	FSR0, myArray	; Load FSR0 with address in RAM	
+	;movlw	upper(myTable)	; address of data in PM
 	movwf	TBLPTRU		; load upper bits to TBLPTRU
 	movlw	high(myTable)	; address of data in PM
 	movwf	TBLPTRH		; load high byte to TBLPTRH

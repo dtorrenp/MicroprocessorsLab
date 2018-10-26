@@ -24,6 +24,8 @@ Pad_Setup
     call    PAD_delay_x4us
     movlw   0x00
     movwf   TRISD, A
+    movlw   0x00
+    movwf   TRISH, A
     return
     
 Pad_Read
@@ -45,105 +47,104 @@ Pad_Read
     
     movlw   b'11111111'		    
     cpfseq  pad_final			;if no button is pressed reads again
-    retlw   0xFF
-    
-Check_symbol
+    bra	    oneRoneC
+    retlw   0x20
 
     oneRoneC
     movlw   b'01110111'		    
     cpfseq  pad_final			;first row first column
     bra	    twoRoneC
-    retlw   0x31
+    retlw   0x43
     
     twoRoneC
     movlw   b'10110111'		    
     cpfseq  pad_final			;second row first column
     bra	    threeRoneC
-    retlw   0x34
+    retlw   0x44
    
     threeRoneC
     movlw   b'11010111'		    
     cpfseq  pad_final			;third row first column
     bra	    fourRoneC
-    retlw   0x37
+    retlw   0x45
     
     fourRoneC
     movlw   b'11100111'		    
     cpfseq  pad_final			;fourth row first column
     bra	    oneRtwoC
-    retlw   0x41
+    retlw   0x46
     
     oneRtwoC
     movlw   b'01111011'		    
     cpfseq  pad_final			;first row second column
     bra	    twoRtwoC
-    retlw   0x32
+    retlw   0x42
     
     twoRtwoC
     movlw   b'10111011'			;second row second column
     cpfseq  pad_final			
     bra	    threeRtwoC
-    retlw   0x35
+    retlw   0x39
     
     threeRtwoC
     movlw   b'11011011'			;third row second column
     cpfseq  pad_final			
     bra	    fourRtwoC
-    retlw   0x38
+    retlw   0x36
     
     fourRtwoC
     movlw   b'11101011'		    
     cpfseq  pad_final			;fourth row second column etc
     bra	    oneRthreeC
-    retlw   0x30
+    retlw   0x33
     
     oneRthreeC
     movlw   b'01111101'		    
     cpfseq  pad_final			
     bra	    twoRthreeC
-    retlw   0x33
+    retlw   0x30
     
     twoRthreeC
     movlw   b'10111101'		    
     cpfseq  pad_final			
     bra	    threeRthreeC
-    retlw   0x36
+    retlw   0x38
     
     threeRthreeC
     movlw   b'11011101'		    
     cpfseq  pad_final			
     bra	    fourRthreeC
-    retlw   0x39
+    retlw   0x35
     
     fourRthreeC
     movlw   b'11101101'		    
     cpfseq  pad_final			
     bra	    oneRfourC
-    retlw   0x42
+    retlw   0x32
     
     oneRfourC
     movlw   b'01111110'		    
     cpfseq  pad_final			
     bra	    twoRfourC
-    retlw   0x46
+    retlw   0x41
     
     twoRfourC
     movlw   b'10111110'		    
     cpfseq  pad_final			
     bra	    threeRfourC
-    retlw   0x45
+    retlw   0x37
     
     threeRfourC
     movlw   b'11011110'		    
     cpfseq  pad_final			
     bra	    fourRfourC
-    retlw   0x44
+    retlw   0x34
     
     fourRfourC
     movlw   b'11101110'		    
     cpfseq  pad_final			
-    return  0xFF
-    retlw   0x43
+    return  0x20
+    retlw   0x31
     
 PAD_delay_x4us			; delay given in chunks of 4 microsecond in W
     movwf	PAD_cnt_l	; now need to multiply by 16
