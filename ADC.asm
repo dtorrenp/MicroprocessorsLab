@@ -1,38 +1,41 @@
 #include p18f87k22.inc
 
-    global  ADC_Setup, ADC_Read, eight_bit_by_sixteen,add_check_setup
+    global  ADC_Setup, ADC_Read, eight_bit_by_sixteen,add_check_setup,sixteen_bit_by_sixteen,eight_bit_by_twentyfour
     
 acs0	udata_acs   ; reserve data space in access ram
 input_one_lower	    res 1   ; reserve one byte 
 input_one_upper	    res 1   ; reserve one byte 
-input_two_lower	    res 1   ; reserve one byte
+input_two_lower	    res 1   ; reserve one byte	    
 input_two_upper	    res 1   ; reserve one byte 
+	    
+input_one_super    res 1   ; reserve one byte
+input_two_super   res 1   ; reserve one byte
+   
 result_lower	    res 1
-result_mid		    res 1
+result_mid	    res 1
 result_upper	    res 1
-;acs_ovr access_ovr
-lowest_low res 1
-highest_low res 1
-lowest_high res 1
-highest_high res 1
- 
+result_super	    res 1
+
 ADC    code
     
 add_check_setup
     movlw   0x00
-    movwf   PORTH
     movwf   PORTD
     movwf   PORTJ
+    movwf   PORTH
+    movwf   PORTE
     
-    movlw	0xF2
+    movlw	0x37
     movwf	input_two_lower
-    movlw	0x35
+    movlw	0xEF
     movwf	input_one_lower
-    movlw	0xA5
+    movlw	0xCD
     movwf	input_one_upper
+    movlw	0xAB
+    movwf	input_two_super
     return
+    
 eight_bit_by_sixteen
- 
     movf  input_one_lower,W
     mulwf input_two_lower
     movff PRODL,result_lower
@@ -49,11 +52,70 @@ eight_bit_by_sixteen
     
     movff   result_upper, PORTH
     movff   result_mid, PORTD
-    movff   result_lower, PORTJ
+    movff   result_lower, PORTF
     return
-;sixteen_bit_by_sixteen
     
-;eight_bit_by_twentyfour
+sixteen_bit_by_sixteen
+    movf  input_one_lower,W	;moving lower bit one into w
+    mulwf input_two_lower	;multiplying lower bytes of both
+    movff PRODL,result_lower	;moving lowest byte result into file
+    movff PRODH, result_mid	;moving 2nd byte into file
+    movf  input_one_upper,W	;moving upper byte one into w
+    mulwf input_two_lower	;multiply with lower byte two
+    movf PRODL,W		;movwe lower result into w
+    addwf   result_mid,f	;add lower result byte to 2nd storeed result byte
+    movff PRODH, result_upper	;move 3rd byte result into file
+    movlw 0x00			
+    addwfc result_upper,f	;add any carry bit to 3rd byte result
+    
+    movf  input_one_lower,W 	
+    mulwf input_two_upper
+    movf   PRODL,W
+    addwf   result_mid,f
+    movf   PRODH,W
+    addwfc   result_upper,f
+    movlw 0x00
+    addwfc result_upper,f
+    
+    movf  input_one_upper,W
+    mulwf input_two_upper
+    movf   PRODL,W
+    addwf   result_upper,f
+    movlw 0x00
+    addwfc result_super,f
+    movf   PRODH,W
+    addwf   result_super,f
+    
+    movff   result_super, PORTD
+    movff   result_upper, PORTH
+    movff   result_mid, PORTE
+    movff   result_lower, PORTJ
+    
+    return
+    
+eight_bit_by_twentyfour
+    movf  input_one_lower,W
+    mulwf input_two_lower
+    movff PRODL,result_lower
+    movff PRODH, result_mid
+    movf  input_one_upper,W
+    mulwf input_two_lower
+    movf PRODL,W
+    addwf   result_mid,f
+    movff PRODH, result_upper
+    movf  input_one_super,W
+    mulwf input_two_lower
+    movf PRODL,W
+    addwfc   result_upper,f
+    movff PRODH,result_super
+    movlw 0x00
+    addwfc result_super,f
+    
+    movff   result_super, PORTD
+    movff   result_upper, PORTH
+    movff   result_mid, PORTE
+    movff   result_lower, PORTJ 
+    return
     
 ADC_Setup
     bsf	    TRISA,RA0	    ; use pin A0(==AN0) for input
