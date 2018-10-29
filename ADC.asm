@@ -1,8 +1,59 @@
 #include p18f87k22.inc
 
-    global  ADC_Setup, ADC_Read
+    global  ADC_Setup, ADC_Read, eight_bit_by_sixteen,add_check_setup
     
-ADC    code
+    acs0	udata_acs   ; reserve data space in access ram
+    input_one_lower	    res 1   ; reserve one byte 
+    input_one_upper	    res 1   ; reserve one byte 
+    input_two_lower	    res 1   ; reserve one byte
+    input_two_upper	    res 1   ; reserve one byte 
+    result_lower	    res 1
+    result_mid		    res 1
+    result_upper	    res 1
+
+    acs_ovr access_ovr
+    lowest_low res 1
+    highest_low res 1
+    lowest_high res 1
+    highest_low res 1
+ 
+ ADC    code
+    
+ add_check_setup
+    movlw   0x00
+    movwf   PORTC
+    movwf   PORTD
+    movwf   PORTE
+    
+    movlw	0x01
+    movwf	input_two_lower
+    movlw	0x35
+    movwf	input_one_lower
+    movlw	0xA5
+    movwf	input_one_upper
+    return
+eight_bit_by_sixteen
+ 
+    movf  input_one_lower,W
+    mulwf input_two_lower
+    movff PRODL,result_lower
+    movff PRODH, result_mid
+    
+    movf  input_one_upper,W
+    mulwf input_two_lower
+    movf PRODL,W
+    addwf   result_mid,result_mid     
+    movff PRODH, result_upper
+    movlw 0x00
+    addwfc result_upper,result_upper
+    
+    movff   result_upper, PORTC
+    movff   result_mid, PORTD
+    movff   result_lower, PORTE
+    return
+;sixteen_bit_by_sixteen
+    
+;eight_bit_by_twentyfour
     
 ADC_Setup
     bsf	    TRISA,RA0	    ; use pin A0(==AN0) for input
@@ -21,5 +72,7 @@ adc_loop
     btfsc   ADCON0,GO	    ; check to see if finished
     bra	    adc_loop
     return
+
+
 
     end
