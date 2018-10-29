@@ -36,7 +36,7 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	
 	; ******* Main programme ****************************************
 start 	
-	call	eight_bit_by_twentyfour
+	call	sixteen_bit_by_sixteen
 	bra	start
 	
 	call	Pad_Read

@@ -21,18 +21,19 @@ ADC    code
 add_check_setup
     movlw   0x00
     movwf   PORTD
-    movwf   PORTJ
-    movwf   PORTH
-    movwf   PORTE
     
-    movlw	0x37
+    movlw	0xFF
     movwf	input_two_lower
-    movlw	0xEF
+    movlw	0xFF
+    movwf	input_two_upper
+    
+    
+    movlw	0xFF
     movwf	input_one_lower
-    movlw	0xCD
+    movlw	0xFF
     movwf	input_one_upper
-    movlw	0xAB
-    movwf	input_two_super
+    movlw	0xFF
+    movwf	input_one_super
     return
     
 eight_bit_by_sixteen
@@ -50,9 +51,11 @@ eight_bit_by_sixteen
     movlw 0x00
     addwfc result_upper,f
     
-    movff   result_upper, PORTH
+    movff   result_super, PORTD
+    movff   result_upper, PORTD
     movff   result_mid, PORTD
-    movff   result_lower, PORTF
+    movff   result_lower, PORTD
+    
     return
     
 sixteen_bit_by_sixteen
@@ -60,6 +63,7 @@ sixteen_bit_by_sixteen
     mulwf input_two_lower	;multiplying lower bytes of both
     movff PRODL,result_lower	;moving lowest byte result into file
     movff PRODH, result_mid	;moving 2nd byte into file
+    
     movf  input_one_upper,W	;moving upper byte one into w
     mulwf input_two_lower	;multiply with lower byte two
     movf PRODL,W		;movwe lower result into w
@@ -68,53 +72,60 @@ sixteen_bit_by_sixteen
     movlw 0x00			
     addwfc result_upper,f	;add any carry bit to 3rd byte result
     
-    movf  input_one_lower,W 	
-    mulwf input_two_upper
-    movf   PRODL,W
-    addwf   result_mid,f
-    movf   PRODH,W
-    addwfc   result_upper,f
-    movlw 0x00
-    addwfc result_upper,f
-    
     movf  input_one_upper,W
     mulwf input_two_upper
+    movff   PRODH, result_super
     movf   PRODL,W
     addwf   result_upper,f
     movlw 0x00
     addwfc result_super,f
+    
+    movf  input_one_lower,W 	
+    mulwf input_two_upper
+    movf   PRODL,W
+    addwf   result_mid,f
+    movlw 0x00
+    addwfc result_upper,f
     movf   PRODH,W
-    addwf   result_super,f
+    addwf   result_upper,f
+    movlw 0x00
+    addwfc result_super,f
     
     movff   result_super, PORTD
-    movff   result_upper, PORTH
-    movff   result_mid, PORTE
-    movff   result_lower, PORTJ
+    movff   result_upper, PORTD
+    movff   result_mid, PORTD
+    movff   result_lower, PORTD
     
     return
     
 eight_bit_by_twentyfour
+    
     movf  input_one_lower,W
     mulwf input_two_lower
     movff PRODL,result_lower
     movff PRODH, result_mid
+    
     movf  input_one_upper,W
     mulwf input_two_lower
     movf PRODL,W
     addwf   result_mid,f
     movff PRODH, result_upper
+    movlw 0x00
+    addwfc result_upper,f
+    
     movf  input_one_super,W
     mulwf input_two_lower
     movf PRODL,W
-    addwfc   result_upper,f
+    addwf   result_upper,f
     movff PRODH,result_super
     movlw 0x00
     addwfc result_super,f
     
     movff   result_super, PORTD
-    movff   result_upper, PORTH
-    movff   result_mid, PORTE
-    movff   result_lower, PORTJ 
+    movff   result_upper, PORTD
+    movff   result_mid, PORTD
+    movff   result_lower, PORTD
+    
     return
     
 ADC_Setup
