@@ -2,30 +2,29 @@
 
     global  ADC_Setup, ADC_Read, eight_bit_by_sixteen,add_check_setup
     
-    acs0	udata_acs   ; reserve data space in access ram
-    input_one_lower	    res 1   ; reserve one byte 
-    input_one_upper	    res 1   ; reserve one byte 
-    input_two_lower	    res 1   ; reserve one byte
-    input_two_upper	    res 1   ; reserve one byte 
-    result_lower	    res 1
-    result_mid		    res 1
-    result_upper	    res 1
-
-    acs_ovr access_ovr
-    lowest_low res 1
-    highest_low res 1
-    lowest_high res 1
-    highest_low res 1
+acs0	udata_acs   ; reserve data space in access ram
+input_one_lower	    res 1   ; reserve one byte 
+input_one_upper	    res 1   ; reserve one byte 
+input_two_lower	    res 1   ; reserve one byte
+input_two_upper	    res 1   ; reserve one byte 
+result_lower	    res 1
+result_mid		    res 1
+result_upper	    res 1
+;acs_ovr access_ovr
+lowest_low res 1
+highest_low res 1
+lowest_high res 1
+highest_high res 1
  
- ADC    code
+ADC    code
     
- add_check_setup
+add_check_setup
     movlw   0x00
-    movwf   PORTC
+    movwf   PORTH
     movwf   PORTD
-    movwf   PORTE
+    movwf   PORTJ
     
-    movlw	0x01
+    movlw	0xF2
     movwf	input_two_lower
     movlw	0x35
     movwf	input_one_lower
@@ -42,14 +41,15 @@ eight_bit_by_sixteen
     movf  input_one_upper,W
     mulwf input_two_lower
     movf PRODL,W
-    addwf   result_mid,result_mid     
+    addwf   result_mid,f
+    
     movff PRODH, result_upper
     movlw 0x00
-    addwfc result_upper,result_upper
+    addwfc result_upper,f
     
-    movff   result_upper, PORTC
+    movff   result_upper, PORTH
     movff   result_mid, PORTD
-    movff   result_lower, PORTE
+    movff   result_lower, PORTJ
     return
 ;sixteen_bit_by_sixteen
     
