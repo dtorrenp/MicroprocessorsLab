@@ -133,22 +133,25 @@ eight_bit_by_twentyfour
     return
     
 ADC_convert
+    movff	ADRESL,input_one_lower
+    movff	ADRESH,input_one_upper
+    
     movlw	0x8A
     movwf	input_two_lower
     movlw	0x41
     movwf	input_two_upper
     
-    
-    movlw	0x01
-    movwf	input_one_lower
-    movlw	0x00
-    movwf	input_one_upper
-
     call	sixteen_bit_by_sixteen
     call	ADC_compare
     call	LCD_Send_Byte_D
     movlw	.255
     call	LCD_delay_ms
+    
+    movlw	0x2E
+    call	LCD_Send_Byte_D
+    movlw	.255
+    call	LCD_delay_ms
+    
     
     movlw	0x0A
     movwf	input_two_lower
@@ -179,6 +182,11 @@ ADC_convert
     
     call	eight_bit_by_twentyfour
     call	ADC_compare
+    call	LCD_Send_Byte_D
+    movlw	.255
+    call	LCD_delay_ms
+    
+    movlw	0x56
     call	LCD_Send_Byte_D
     movlw	.255
     call	LCD_delay_ms
