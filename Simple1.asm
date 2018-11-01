@@ -1,6 +1,6 @@
 	#include p18f87k22.inc
 
-	extern	LCD_Write_Hex, ADC_Setup, ADC_Read, add_check_setup, eight_bit_by_sixteen,sixteen_bit_by_sixteen,eight_bit_by_twentyfour		    ; external ADC routines
+	extern	LCD_Write_Hex, ADC_Setup, ADC_Read, add_check_setup, eight_bit_by_sixteen,sixteen_bit_by_sixteen,eight_bit_by_twentyfour, ADC_convert		    ; external ADC routines
 	extern	UART_Setup, UART_Transmit_Message  ; external UART subroutines
 	extern  LCD_Setup, LCD_Write_Message, LCD_clear, LCD_move,LCD_delay_ms,LCD_Send_Byte_D,LCD_shiftright	; external LCD subroutines
 	extern	Pad_Setup, Pad_Read
@@ -36,7 +36,13 @@ setup	bcf	EECON1, CFGS	; point to Flash program memory
 	
 	; ******* Main programme ****************************************
 start 	
-	call	sixteen_bit_by_sixteen
+	call	ADC_convert
+	movlw	.255
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	call	LCD_delay_ms
+	
+	call	LCD_clear
 	bra	start
 	
 	call	Pad_Read
